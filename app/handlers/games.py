@@ -39,15 +39,15 @@ async def start_create_game(message: Message, state: FSMContext) -> None:
 async def set_title(message: Message, state: FSMContext) -> None:
     await state.update_data(title=message.text.strip())
     await state.set_state(CreateGameState.deadline)
-    await message.answer("Укажите дедлайн в формате YYYY-MM-DD HH:MM (UTC):")
+    await message.answer("Укажите дедлайн в формате 22.12.2025 22:00:")
 
 
 @games_router.message(StateFilter(CreateGameState.deadline))
 async def set_deadline(message: Message, state: FSMContext) -> None:
     try:
-        deadline = datetime.strptime(message.text.strip(), "%Y-%m-%d %H:%M")
+        deadline = datetime.strptime(message.text.strip(), "%d.%m.%Y %H:%M")
     except ValueError:
-        await message.answer("Неверный формат. Повторите в виде YYYY-MM-DD HH:MM.")
+        await message.answer("Неверный формат. Повторите в виде 22.12.2025 22:00.")
         return
 
     await state.update_data(deadline=deadline)
@@ -78,7 +78,8 @@ async def finish_create(message: Message, state: FSMContext) -> None:
 
     await message.answer(
         f"Игра создана! Код: <code>{game.game_id}</code>\n"
-        "Поделитесь кодом с друзьями, чтобы они могли присоединиться через /join."
+        f"Поделитесь кодом с друзьями, чтобы они могли присоединиться через /join {game.game_id}."
+        f"Или используйте ссылку https://t.me/AnotherSilencebot?start={game.game_id}"
     )
 
 
@@ -125,7 +126,7 @@ async def notify_participants(
 ) -> None:
     participant_map = {p.user_id: p for p in participants}
     budget_text = f"{game.budget}₽" if game.budget else "без ограничений"
-    deadline_text = game.deadline.strftime("%Y-%m-%d %H:%M")
+    deadline_text = game.deadline.strftime("%d.%m.%Y %H:%M")
 
     for giver_id, receiver_id in assignments:
         giver = participant_map[giver_id]

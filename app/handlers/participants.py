@@ -24,8 +24,8 @@ class JoinGameState(StatesGroup):
 
 @participants_router.message(Command("join"))
 async def join_game(message: Message, command: CommandObject, state: FSMContext) -> None:
-    if not command.args:
-        await message.answer("Укажите код игры: /join <код>")
+    if command.args == None:
+        await message.answer("Укажите код игры: /join &lt;код&gt")
         return
 
     game_code = command.args.strip()
